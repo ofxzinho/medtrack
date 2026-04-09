@@ -62,7 +62,7 @@ A escolha por uma interface de terminal (CLI) garante leveza, rapidez e foco tot
 git clone https://github.com/ofxzinho/medtrack.git
 cd medtrack
 mvn package -DskipTests
-java -jar target/medtrack-1.0.0-jar-with-dependencies.jar
+java -jar target/medtrack-1.1.0-jar-with-dependencies.jar
 ```
 
 ---
