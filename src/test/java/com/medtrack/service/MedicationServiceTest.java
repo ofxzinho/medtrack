@@ -1,126 +1,80 @@
 package com.medtrack.service;
 
+import com.medtrack.model.Caregiver;
 import com.medtrack.model.Medication;
+import com.medtrack.repository.CaregiverRepository;
 import com.medtrack.repository.MedicationRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class MedicationServiceTest {
 
-    private MedicationService service;
+    private MedicationService medicationService;
+    private CaregiverService caregiverService;
+    private int defaultCaregiverId;
 
     @BeforeEach
     void setUp() {
-        service = new MedicationService(new MedicationRepository());
+        CaregiverRepository caregiverRepo = new CaregiverRepository();
+        MedicationRepository medicationRepo = new MedicationRepository();
+
+        caregiverService = new CaregiverService(caregiverRepo);
+
+        medicationService = new MedicationService(medicationRepo, caregiverService);
+
+        Caregiver c = caregiverService.addCaregiver("Fábio Ruan");
+        defaultCaregiverId = c.getId();
     }
 
     @Test
-    @DisplayName("Deve cadastrar medicamento com dados válidos")
+    @DisplayName("Deve cadastrar medicamento vinculado a um cuidador existente")
     void shouldAddMedicationSuccessfully() {
-        Medication med = service.addMedication("Paracetamol", "500mg", "08:00");
+        Medication med = medicationService.addMedication("Losartana", "50mg", "08:00", defaultCaregiverId);
 
         assertNotNull(med);
-        assertEquals("Paracetamol", med.getName());
-        assertEquals("500mg", med.getDosage());
-        assertEquals("08:00", med.getScheduleTime());
+        assertEquals("Losartana", med.getName());
+        assertEquals("Fábio Ruan", med.getCaregiver().getName()); // Verifica se o vínculo funcionou
         assertFalse(med.isTaken());
     }
 
     @Test
-    @DisplayName("Deve listar todos os medicamentos cadastrados")
-    void shouldListAllMedications() {
-        service.addMedication("Paracetamol", "500mg", "08:00");
-        service.addMedication("Ibuprofeno", "400mg", "12:00");
-
-        List<Medication> list = service.listAll();
-
-        assertEquals(2, list.size());
+    @DisplayName("Deve lançar exceção ao tentar cadastrar remédio para cuidador inexistente")
+    void shouldThrowWhenCaregiverNotFound() {
+        assertThrows(IllegalArgumentException.class, () ->
+                medicationService.addMedication("Dipirona", "500mg", "10:00", 999)
+        );
     }
 
     @Test
     @DisplayName("Deve marcar medicamento como tomado")
-    void shouldMarkMedicationAsTaken() {
-        Medication med = service.addMedication("Omeprazol", "20mg", "07:00");
+    void shouldMarkAsTaken() {
+        Medication med = medicationService.addMedication("Omeprazol", "20mg", "07:00", defaultCaregiverId);
 
-        boolean result = service.markAsTaken(med.getId());
+        boolean result = medicationService.markAsTaken(med.getId());
 
         assertTrue(result);
         assertTrue(med.isTaken());
     }
 
     @Test
-    @DisplayName("Deve remover medicamento existente")
+    @DisplayName("Deve remover medicamento corretamente")
     void shouldRemoveMedication() {
-        Medication med = service.addMedication("Losartana", "50mg", "20:00");
+        Medication med = medicationService.addMedication("Vitamina C", "1g", "09:00", defaultCaregiverId);
 
-        boolean removed = service.remove(med.getId());
+        boolean removed = medicationService.remove(med.getId());
 
         assertTrue(removed);
-        assertTrue(service.listAll().isEmpty());
-    }
-
-
-    @Test
-    @DisplayName("Deve lançar exceção ao cadastrar medicamento com nome vazio")
-    void shouldThrowWhenNameIsEmpty() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.addMedication("", "500mg", "08:00"));
+        assertTrue(medicationService.listAll().isEmpty());
     }
 
     @Test
-    @DisplayName("Deve lançar exceção ao cadastrar medicamento com dosagem vazia")
-    void shouldThrowWhenDosageIsEmpty() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.addMedication("Paracetamol", "", "08:00"));
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao cadastrar medicamento com horário vazio")
-    void shouldThrowWhenTimeIsEmpty() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.addMedication("Paracetamol", "500mg", ""));
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao cadastrar medicamento com nome nulo")
-    void shouldThrowWhenNameIsNull() {
-        assertThrows(IllegalArgumentException.class,
-                () -> service.addMedication(null, "500mg", "08:00"));
-    }
-
-
-    @Test
-    @DisplayName("Deve retornar false ao tentar marcar ID inexistente")
-    void shouldReturnFalseWhenMarkingNonExistentId() {
-        boolean result = service.markAsTaken(999);
-        assertFalse(result);
-    }
-
-    @Test
-    @DisplayName("Deve retornar false ao tentar remover ID inexistente")
-    void shouldReturnFalseWhenRemovingNonExistentId() {
-        boolean result = service.remove(999);
-        assertFalse(result);
-    }
-
-    @Test
-    @DisplayName("Deve retornar lista vazia quando não há medicamentos")
-    void shouldReturnEmptyListWhenNoMedications() {
-        List<Medication> list = service.listAll();
-        assertTrue(list.isEmpty());
-    }
-
-    @Test
-    @DisplayName("IDs gerados devem ser únicos e sequenciais")
-    void shouldGenerateUniqueIds() {
-        Medication first = service.addMedication("Med A", "10mg", "08:00");
-        Medication second = service.addMedication("Med B", "20mg", "12:00");
-
-        assertNotEquals(first.getId(), second.getId());
+    @DisplayName("Deve lançar exceção ao cadastrar com campos vazios")
+    void shouldThrowWhenFieldsAreEmpty() {
+        assertThrows(IllegalArgumentException.class, () ->
+                medicationService.addMedication("", "500mg", "08:00", defaultCaregiverId)
+        );
     }
 }

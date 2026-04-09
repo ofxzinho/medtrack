@@ -1,19 +1,19 @@
 package com.medtrack.model;
-
 public class Medication {
 
     private final int id;
     private final String name;
     private final String dosage;
     private final String scheduleTime;
+    private final Caregiver caregiver;
     private boolean taken;
 
-
-    public Medication(int id, String name, String dosage, String scheduleTime) {
+    public Medication(int id, String name, String dosage, String scheduleTime, Caregiver caregiver) {
         this.id = id;
         this.name = name;
         this.dosage = dosage;
         this.scheduleTime = scheduleTime;
+        this.caregiver = caregiver;
         this.taken = false;
     }
 
@@ -33,6 +33,10 @@ public class Medication {
         return scheduleTime;
     }
 
+    public Caregiver getCaregiver() {
+        return caregiver;
+    }
+
     public boolean isTaken() {
         return taken;
     }
@@ -44,7 +48,7 @@ public class Medication {
     @Override
     public String toString() {
         String status = taken ? "✔ Tomado" : "✘ Pendente";
-        return String.format("[%d] %s | %s | %s | %s",
-                id, name, dosage, scheduleTime, status);
+        return String.format("[%d] %s (%s) às %s | Cuidador: %s | %s",
+                id, name, dosage, scheduleTime, caregiver.getName(), status);
     }
 }

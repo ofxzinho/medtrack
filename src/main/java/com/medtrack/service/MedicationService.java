@@ -1,5 +1,6 @@
 package com.medtrack.service;
 
+import com.medtrack.model.Caregiver;
 import com.medtrack.model.Medication;
 import com.medtrack.repository.MedicationRepository;
 import java.util.List;
@@ -8,42 +9,47 @@ import java.util.Optional;
 public class MedicationService {
 
     private final MedicationRepository repository;
+    private final CaregiverService caregiverService;
 
-    public MedicationService(MedicationRepository repository) {
+    public MedicationService(MedicationRepository repository, CaregiverService caregiverService) {
         this.repository = repository;
+        this.caregiverService = caregiverService;
     }
 
-    public Medication addMedication(String name, String dosage, String scheduleTime) {
-        if (name == null || name.isBlank()) {
-            throw new IllegalArgumentException("Nome do medicamento não pode ser vazio.");
-        }
-        if (dosage == null || dosage.isBlank()) {
-            throw new IllegalArgumentException("Dosagem não pode ser vazia.");
-        }
-        if (scheduleTime == null || scheduleTime.isBlank()) {
-            throw new IllegalArgumentException("Horário não pode ser vazio.");
+    public Medication addMedication(String name, String dosage, String scheduleTime, int caregiverId) {
+        if (isInvalid(name) || isInvalid(dosage) || isInvalid(scheduleTime)) {
+            throw new IllegalArgumentException("Nome, dosagem e horário são obrigatórios.");
         }
 
-        Medication medication = new Medication(
-                repository.nextId(), name.trim(), dosage.trim(), scheduleTime.trim()
-        );
-        repository.add(medication);
+        Optional<Caregiver> caregiverOpt = caregiverService.findById(caregiverId);
+        if (caregiverOpt.isEmpty()) {
+            throw new IllegalArgumentException("Erro: Cuidador não encontrado com ID " + caregiverId);
+        }
+
+        int id = repository.getNextId();
+        Medication medication = new Medication(id, name, dosage, scheduleTime, caregiverOpt.get());
+        repository.save(medication);
         return medication;
     }
 
+    private boolean isInvalid(String s) {
+        return s == null || s.isBlank();
+    }
 
     public List<Medication> listAll() {
         return repository.findAll();
     }
 
-
     public boolean markAsTaken(int id) {
-        Optional<Medication> found = repository.findById(id);
-        found.ifPresent(m -> m.setTaken(true));
-        return found.isPresent();
+        Optional<Medication> med = repository.findById(id);
+        if (med.isPresent()) {
+            med.get().setTaken(true);
+            return true;
+        }
+        return false;
     }
 
     public boolean remove(int id) {
-        return repository.removeById(id);
+        return repository.delete(id);
     }
 }
