@@ -1,8 +1,23 @@
 # MedTrack
 
 [![CI](https://github.com/ofxzinho/medtrack/actions/workflows/ci.yml/badge.svg)](https://github.com/ofxzinho/medtrack/actions)
+[![Download](https://img.shields.io/badge/Download-v1.2.0-blue)](https://github.com/ofxzinho/medtrack/releases/tag/v1.2.0)
 
 Aplicação CLI desenvolvida para o controle de horários e dosagens de medicamentos, focada em auxiliar idosos e seus cuidadores através de um sistema de monitoramento colaborativo e normalizado.
+
+---
+
+##  Deploy
+
+A aplicação está publicada e disponível para download na página de releases do GitHub:
+
+** [Download MedTrack v1.2.0](https://github.com/ofxzinho/medtrack/releases/tag/v1.2.0)**
+
+Após baixar o `.jar`, execute com:
+
+```bash
+java -jar medtrack-1.2.0-jar-with-dependencies.jar
+```
 
 ---
 
@@ -18,7 +33,7 @@ Além disso, familiares e cuidadores muitas vezes têm dificuldade em acompanhar
 
 O **MedTrack** evoluiu para uma arquitetura robusta onde o **Cuidador** e o **Medicamento** são entidades independentes. Isso permite que um único cuidador gerencie múltiplos medicamentos de forma organizada e rastreável.
 
-A escolha por uma interface de terminal (CLI) garante leveza, rapidez e foco total na funcionalidade de segurança do paciente, sem distrações visuais.
+A partir da versão 1.2.0, a aplicação também se integra à **API pública OpenFDA**, permitindo consultar informações oficiais sobre medicamentos diretamente pelo terminal.
 
 ---
 
@@ -36,6 +51,7 @@ A escolha por uma interface de terminal (CLI) garante leveza, rapidez e foco tot
 - **Monitoramento em Tempo Real:** Listagem com status (Pendente ou Tomado)
 - **Segurança de Dados:** Validação que impede cadastro sem cuidador válido
 - **Controle de Dose:** Atualização de status e remoção via ID
+- **Consulta OpenFDA:** Busca de informações oficiais sobre medicamentos via API pública
 
 ---
 
@@ -46,6 +62,7 @@ A escolha por uma interface de terminal (CLI) garante leveza, rapidez e foco tot
 - JUnit 5
 - Checkstyle
 - GitHub Actions (CI)
+- OpenFDA API (https://api.fda.gov)
 
 ---
 
@@ -62,7 +79,7 @@ A escolha por uma interface de terminal (CLI) garante leveza, rapidez e foco tot
 git clone https://github.com/ofxzinho/medtrack.git
 cd medtrack
 mvn package -DskipTests
-java -jar target/medtrack-1.1.0-jar-with-dependencies.jar
+java -jar target/medtrack-1.2.0-jar-with-dependencies.jar
 ```
 
 ---
@@ -87,7 +104,7 @@ mvn checkstyle:check
 
 ```text
 ╔════════════════════════════════════╗
-║         MEDTRACK v1.1.0            ║
+║         MEDTRACK v1.2.0            ║
 ║   Monitoramento de Saúde Familiar  ║
 ╚════════════════════════════════════╝
 
@@ -98,23 +115,22 @@ mvn checkstyle:check
 4. Listar Medicamentos
 5. Marcar como Tomado
 6. Remover Medicamento
-7. Sair
+7. Consultar Medicamento na FDA
+8. Sair
 
-Escolha: 1
-Nome do Cuidador: Fábio Ruan
-✔ Cuidador cadastrado com ID: 1
+Escolha: 7
+Nome do medicamento para consultar na FDA: aspirin
+🔍 Consultando base da FDA...
 
-Escolha: 3
-ID do Cuidador responsável: 1
-Nome do medicamento: Losartana
-Dosagem: 50mg
-Horário: 08:00
-✔ Medicamento cadastrado com sucesso!
+--- Informações da FDA ---
+Fabricante : Bayer
+Indicação  : For the temporary relief of headache...
+--------------------------
 ```
 
 ---
 
-## 9. Estrutura do Projeto (v1.1.0)
+## 9. Estrutura do Projeto (v1.2.0)
 
 ```text
 medtrack/
@@ -130,9 +146,12 @@ medtrack/
 │   │   │   └── MedicationRepository.java
 │   │   └── service/
 │   │       ├── CaregiverService.java
-│   │       └── MedicationService.java
+│   │       ├── MedicationService.java
+│   │       └── OpenFdaService.java
 │   └── test/java/com/medtrack/
-│       └── service/MedicationServiceTest.java
+│       └── service/
+│           ├── MedicationServiceTest.java
+│           └── OpenFdaServiceTest.java
 ├── .github/workflows/ci.yml
 ├── checkstyle.xml
 ├── pom.xml
@@ -143,7 +162,8 @@ medtrack/
 
 ## 10. Informações do Projeto
 
-- **Versão:** 1.1.0 (Arquitetura Normalizada)
+- **Versão:** 1.2.0 (Integração OpenFDA)
 - **Autor:** Fábio Ruan
 - **Instituição:** UniCEUB
 - **Repositório:** https://github.com/ofxzinho/medtrack
+- **Deploy:** https://github.com/ofxzinho/medtrack/releases/tag/v1.2.0
