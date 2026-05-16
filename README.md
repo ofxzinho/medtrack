@@ -62,7 +62,7 @@ A partir da versão 1.2.0, a aplicação também se integra à **API pública Op
 - JUnit 5
 - Checkstyle
 - GitHub Actions (CI)
-- OpenFDA API (https://api.fda.gov)
+- OpenFDA API (https://open.fda.gov)
 
 ---
 
