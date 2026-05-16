@@ -19,3 +19,10 @@ Todas as mudanças notáveis deste projeto serão documentadas aqui.
 - Cadastro e listagem de medicamentos
 - Controle de status (Pendente / Tomado)
 - Remoção de medicamento por ID
+
+## [1.2.0] - 16/05/2026
+
+### Adicionado
+- Integração com a API pública OpenFDA para consulta de medicamentos
+- Nova opção no menu CLI: Consultar Medicamento na FDA
+- Teste de integração automatizado para OpenFdaService
