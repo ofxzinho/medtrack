@@ -147,7 +147,7 @@ public class CLI {
     }
 
     private void searchFda() {
-        System.out.print("\nNome do medicamento para consultar na FDA: ");
+        System.out.print("\nNome do medicamento para consultar na FDA (em inglês, ex: losartan): ");
         String nome = scanner.nextLine().trim();
         if (nome.isEmpty()) {
             System.out.println("⚠ Nome inválido.");
