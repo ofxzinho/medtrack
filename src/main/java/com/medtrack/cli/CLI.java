@@ -4,25 +4,28 @@ import com.medtrack.model.Caregiver;
 import com.medtrack.model.Medication;
 import com.medtrack.service.CaregiverService;
 import com.medtrack.service.MedicationService;
+import com.medtrack.service.OpenFdaService;
 import java.util.List;
 import java.util.Scanner;
-
 
 public class CLI {
 
     private final MedicationService medService;
     private final CaregiverService caregiverService;
+    private final OpenFdaService openFdaService;
     private final Scanner scanner;
 
-    public CLI(MedicationService medService, CaregiverService caregiverService, Scanner scanner) {
+    public CLI(MedicationService medService, CaregiverService caregiverService,
+               OpenFdaService openFdaService, Scanner scanner) {
         this.medService = medService;
         this.caregiverService = caregiverService;
+        this.openFdaService = openFdaService;
         this.scanner = scanner;
     }
 
     public void start() {
         System.out.println("╔════════════════════════════════════╗");
-        System.out.println("║         MEDTRACK v1.1.0            ║");
+        System.out.println("║         MEDTRACK v1.2.0            ║");
         System.out.println("║   Monitoramento de Saúde Familiar  ║");
         System.out.println("╚════════════════════════════════════╝");
 
@@ -37,7 +40,8 @@ public class CLI {
                 case "4" -> listMedications();
                 case "5" -> markTaken();
                 case "6" -> removeMedication();
-                case "7" -> {
+                case "7" -> searchFda();
+                case "8" -> {
                     System.out.println("\nAté logo! Cuide-se.");
                     running = false;
                 }
@@ -54,7 +58,8 @@ public class CLI {
         System.out.println("4. Listar Medicamentos");
         System.out.println("5. Marcar como Tomado");
         System.out.println("6. Remover Medicamento");
-        System.out.println("7. Sair");
+        System.out.println("7. Consultar Medicamento na FDA");
+        System.out.println("8. Sair");
         System.out.print("Escolha: ");
     }
 
@@ -96,7 +101,7 @@ public class CLI {
         String time = scanner.nextLine();
 
         try {
-            Medication med = medService.addMedication(name, dosage, time, caregiverId);
+            medService.addMedication(name, dosage, time, caregiverId);
             System.out.println("\n✔ Medicamento cadastrado com sucesso!");
         } catch (Exception e) {
             System.out.println("\n⚠ Erro: " + e.getMessage());
@@ -139,5 +144,17 @@ public class CLI {
         } catch (NumberFormatException e) {
             System.out.println("⚠ ID inválido.");
         }
+    }
+
+    private void searchFda() {
+        System.out.print("\nNome do medicamento para consultar na FDA: ");
+        String nome = scanner.nextLine().trim();
+        if (nome.isEmpty()) {
+            System.out.println("⚠ Nome inválido.");
+            return;
+        }
+        System.out.println("🔍 Consultando base da FDA...");
+        String resultado = openFdaService.buscarMedicamento(nome);
+        System.out.println(resultado);
     }
 }
