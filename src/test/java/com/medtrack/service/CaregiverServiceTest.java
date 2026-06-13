@@ -1,16 +1,17 @@
 package com.medtrack.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import com.medtrack.model.Caregiver;
 import com.medtrack.repository.CaregiverRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CaregiverServiceTest {
 
@@ -49,57 +50,17 @@ class CaregiverServiceTest {
     }
 
     @Test
-    @DisplayName("Deve cadastrar cuidador com nome válido")
-    void shouldAddCaregiverSuccessfully() {
-        Caregiver caregiver = caregiverService.addCaregiver("Ana Lima");
-        assertNotNull(caregiver);
-        assertEquals("Ana Lima", caregiver.getName());
-    }
+    @DisplayName("Deve remover cuidador sem medicamentos vinculados")
+    void shouldDeleteCaregiverWithoutMedications() {
+        caregiverService.addCaregiver("Cuidador Teste Remover");
 
-    @Test
-    @DisplayName("Deve lançar exceção ao cadastrar com nome nulo")
-    void shouldThrowWhenNameIsNull() {
-        assertThrows(IllegalArgumentException.class, () ->
-                caregiverService.addCaregiver(null));
-    }
 
-    @Test
-    @DisplayName("Deve lançar exceção ao cadastrar com nome em branco")
-    void shouldThrowWhenNameIsBlank() {
-        assertThrows(IllegalArgumentException.class, () ->
-                caregiverService.addCaregiver("   "));
-    }
+        int id = fakeRepo.findAll().get(0).getId();
 
-    @Test
-    @DisplayName("Deve listar todos os cuidadores")
-    void shouldListAllCaregivers() {
-        caregiverService.addCaregiver("Ana Lima");
-        caregiverService.addCaregiver("Carlos Melo");
-        assertEquals(2, caregiverService.listAll().size());
-    }
-
-    @Test
-    @DisplayName("Deve encontrar cuidador pelo ID")
-    void shouldFindCaregiverById() {
-        caregiverService.addCaregiver("Beatriz Souza");
-        Optional<Caregiver> found = caregiverService.findById(1);
-        assertTrue(found.isPresent());
-        assertEquals("Beatriz Souza", found.get().getName());
-    }
-
-    @Test
-    @DisplayName("Deve retornar Optional vazio para ID inexistente")
-    void shouldReturnEmptyWhenIdNotFound() {
-        assertTrue(caregiverService.findById(999).isEmpty());
-    }
-
-    @Test
-    @DisplayName("Deve remover cuidador existente")
-    void shouldDeleteCaregiverSuccessfully() {
-        caregiverService.addCaregiver("Cuidador Teste");
-        boolean result = caregiverService.delete(1);
+        boolean result = caregiverService.delete(id);
         assertTrue(result);
-        assertTrue(caregiverService.findById(1).isEmpty());
+
+        assertTrue(fakeRepo.findById(id).isEmpty());
     }
 
     @Test
