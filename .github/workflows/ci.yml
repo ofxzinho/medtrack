@@ -27,6 +27,10 @@ jobs:
 
       - name: Executar testes
         run: mvn test
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
 
       - name: Empacotar aplicacao
         run: mvn package -DskipTests
+        env:
+          DB_URL: ${{ secrets.DB_URL }}

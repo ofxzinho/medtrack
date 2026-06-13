@@ -18,7 +18,7 @@ public class CaregiverService {
             throw new IllegalArgumentException("O nome do cuidador é obrigatório.");
         }
 
-        Caregiver caregiver = new Caregiver(repository.getNextId(), name);
+        Caregiver caregiver = new Caregiver(0, name);
         repository.save(caregiver);
         return caregiver;
     }
