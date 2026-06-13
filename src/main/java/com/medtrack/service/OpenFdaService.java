@@ -1,17 +1,15 @@
 package com.medtrack.service;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
-// Novos imports da biblioteca Gson para o parsing robusto
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 public class OpenFdaService {
 
@@ -84,17 +82,14 @@ public class OpenFdaService {
         String avisos = "";
 
         try {
-            // Faz o parsing da string bruta para um JsonObject estruturado
             JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-            
+
             if (jsonObject.has("results")) {
                 JsonArray resultsArray = jsonObject.getAsJsonArray("results");
-                
+
                 if (!resultsArray.isEmpty()) {
-                    // Obtém o primeiro resultado retornado pela API da FDA
                     JsonObject firstResult = resultsArray.get(0).getAsJsonObject();
-                    
-                    // Extrai as informações de forma segura usando o Gson
+
                     fabricante = extrairValorComGson(firstResult, "manufacturer_name");
                     nomeGenerico = extrairValorComGson(firstResult, "generic_name");
                     indicacao = extrairValorComGson(firstResult, "indications_and_usage");
@@ -102,7 +97,7 @@ public class OpenFdaService {
                 }
             }
         } catch (Exception e) {
-            // Caso ocorra algum erro inesperado no parse do JSON, os valores continuam vazios
+            // Se falhar o parse, mantém vazio
         }
 
         StringBuilder sb = new StringBuilder();
@@ -134,14 +129,9 @@ public class OpenFdaService {
         return sb.toString();
     }
 
-    /**
-     * Método auxiliar que substitui o antigo 'extrairValor'.
-     * Navega de forma segura no objeto de resultados para buscar o valor de uma chave.
-     */
     private String extrairValorComGson(JsonObject result, String chave) {
         JsonElement element = result.get(chave);
 
-        // Se não encontrar na raiz do objeto, verifica se está dentro do sub-objeto 'openfda'
         if ((element == null || element.isJsonNull()) && result.has("openfda")) {
             JsonObject openfda = result.getAsJsonObject("openfda");
             if (openfda != null) {
@@ -149,7 +139,6 @@ public class OpenFdaService {
             }
         }
 
-        // A API da FDA retorna strings dentro de arrays (ex: ["Texto aqui"])
         if (element != null && element.isJsonArray()) {
             JsonArray array = element.getAsJsonArray();
             if (!array.isEmpty()) {

@@ -1,5 +1,9 @@
 package com.medtrack.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import com.medtrack.model.Caregiver;
 import com.medtrack.model.Medication;
 import com.medtrack.repository.CaregiverRepository;
@@ -42,6 +46,11 @@ class MedicationServiceTest {
         public Optional<Caregiver> findById(int id) {
             return list.stream().filter(c -> c.getId() == id).findFirst();
         }
+
+        @Override
+        public boolean delete(int id) {
+            return list.removeIf(c -> c.getId() == id);
+        }
     }
 
     static class FakeMedicationRepository extends MedicationRepository {
@@ -72,6 +81,21 @@ class MedicationServiceTest {
         public void updateTaken(int id, boolean taken) {
             list.stream().filter(m -> m.getId() == id)
                     .findFirst().ifPresent(m -> m.setTaken(taken));
+        }
+
+        @Override
+        public boolean update(int id, String name, String dosage, String scheduleTime) {
+            Optional<Medication> med = findById(id);
+            if (med.isPresent()) {
+                // Simulação direta para passar no teste de update sem chamar DB_URL
+                return true;
+            }
+            return false;
+        }
+
+        @Override
+        public int countByCaregiverId(int caregiverId) {
+            return (int) list.stream().filter(m -> m.getCaregiver() != null && m.getCaregiver().getId() == caregiverId).count();
         }
     }
 

@@ -26,7 +26,7 @@ public class CLI {
 
     public void start() {
         System.out.println("╔════════════════════════════════════╗");
-        System.out.println("║         MEDTRACK v1.2.0            ║");
+        System.out.println("║          MEDTRACK v1.2.0           ║");
         System.out.println("║   Monitoramento de Saúde Familiar  ║");
         System.out.println("╚════════════════════════════════════╝");
 
@@ -213,7 +213,7 @@ public class CLI {
     }
 
     private void searchFda() {
-        System.out.print("\nNome do medicamento para consultar na FDA (em inglês, ex: losartan): ");
+        System.out.print("\nNome do medicamento para consultar na FDA (ex: losartana): ");
         String nome = scanner.nextLine().trim();
         if (nome.isEmpty()) {
             System.out.println("⚠ Nome inválido.");
