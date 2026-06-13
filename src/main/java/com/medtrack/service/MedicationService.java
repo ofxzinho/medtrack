@@ -26,8 +26,7 @@ public class MedicationService {
             throw new IllegalArgumentException("Erro: Cuidador não encontrado com ID " + caregiverId);
         }
 
-        int id = repository.getNextId();
-        Medication medication = new Medication(id, name, dosage, scheduleTime, caregiverOpt.get());
+        Medication medication = new Medication(0, name, dosage, scheduleTime, caregiverOpt.get());
         repository.save(medication);
         return medication;
     }
@@ -43,7 +42,7 @@ public class MedicationService {
     public boolean markAsTaken(int id) {
         Optional<Medication> med = repository.findById(id);
         if (med.isPresent()) {
-            med.get().setTaken(true);
+            repository.updateTaken(id, true);
             return true;
         }
         return false;
