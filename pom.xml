@@ -6,7 +6,7 @@
 
     <groupId>com.medtrack</groupId>
     <artifactId>medtrack</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
     <packaging>jar</packaging>
 
     <name>MedTrack</name>
@@ -20,36 +20,34 @@
     </properties>
 
     <dependencies>
-    <dependency>
-        <groupId>org.junit.jupiter</groupId>
-        <artifactId>junit-jupiter</artifactId>
-        <version>${junit.version}</version>
-        <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
 
-    <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>42.7.3</version>
-    </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.3</version>
+        </dependency>
 
-    <dependency>
-        <groupId>com.google.code.gson</groupId>
-        <artifactId>gson</artifactId>
-        <version>2.11.0</version>
-    </dependency>
-</dependencies>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
-            <!-- Plugin para rodar os testes -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
             </plugin>
 
-            <!-- Plugin do Checkstyle -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
@@ -70,7 +68,6 @@
                 </executions>
             </plugin>
 
-            <!-- Plugin para gerar o JAR executável com dependências -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -84,6 +81,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
+                    <finalName>medtrack-1.3.0</finalName>
                 </configuration>
                 <executions>
                     <execution>
