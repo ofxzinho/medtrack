@@ -51,4 +51,22 @@ public class MedicationService {
     public boolean remove(int id) {
         return repository.delete(id);
     }
+
+    public Optional<Medication> findById(int id) {
+        return repository.findById(id);
+    }
+
+    public boolean update(int id, String name, String dosage, String scheduleTime) {
+        if (isInvalid(name) || isInvalid(dosage) || isInvalid(scheduleTime)) {
+            throw new IllegalArgumentException("Nome, dosagem e horário são obrigatórios.");
+        }
+        if (repository.findById(id).isEmpty()) {
+            return false;
+        }
+        return repository.update(id, name, dosage, scheduleTime);
+    }
+
+    public int countByCaregiverId(int caregiverId) {
+        return repository.countByCaregiverId(caregiverId);
+    }
 }

@@ -6,6 +6,7 @@ import com.medtrack.service.CaregiverService;
 import com.medtrack.service.MedicationService;
 import com.medtrack.service.OpenFdaService;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class CLI {
@@ -36,12 +37,14 @@ public class CLI {
             switch (input) {
                 case "1" -> addCaregiver();
                 case "2" -> listCaregivers();
-                case "3" -> addMedication();
-                case "4" -> listMedications();
-                case "5" -> markTaken();
-                case "6" -> removeMedication();
-                case "7" -> searchFda();
-                case "8" -> {
+                case "3" -> removeCaregiver();
+                case "4" -> addMedication();
+                case "5" -> listMedications();
+                case "6" -> editMedication();
+                case "7" -> markTaken();
+                case "8" -> removeMedication();
+                case "9" -> searchFda();
+                case "0" -> {
                     System.out.println("\nAté logo! Cuide-se.");
                     running = false;
                 }
@@ -54,12 +57,14 @@ public class CLI {
         System.out.println("\n--- MENU ---");
         System.out.println("1. Cadastrar Cuidador");
         System.out.println("2. Listar Cuidadores");
-        System.out.println("3. Cadastrar Medicamento");
-        System.out.println("4. Listar Medicamentos");
-        System.out.println("5. Marcar como Tomado");
-        System.out.println("6. Remover Medicamento");
-        System.out.println("7. Consultar Medicamento na FDA");
-        System.out.println("8. Sair");
+        System.out.println("3. Remover Cuidador");
+        System.out.println("4. Cadastrar Medicamento");
+        System.out.println("5. Listar Medicamentos");
+        System.out.println("6. Editar Medicamento");
+        System.out.println("7. Marcar como Tomado");
+        System.out.println("8. Remover Medicamento");
+        System.out.println("9. Consultar Medicamento na FDA");
+        System.out.println("0. Sair");
         System.out.print("Escolha: ");
     }
 
@@ -81,6 +86,28 @@ public class CLI {
         } else {
             System.out.println("\n--- CUIDADORES ---");
             list.forEach(System.out::println);
+        }
+    }
+
+    private void removeCaregiver() {
+        System.out.print("\nID do cuidador a remover: ");
+        try {
+            int id = Integer.parseInt(scanner.nextLine().trim());
+            Optional<Caregiver> caregiverOpt = caregiverService.findById(id);
+            if (caregiverOpt.isEmpty()) {
+                System.out.println("⚠ Cuidador não encontrado.");
+                return;
+            }
+            int count = medService.countByCaregiverId(id);
+            if (count > 0) {
+                System.out.println("⚠ Não é possível remover. Existem " + count
+                        + " medicamento(s) vinculado(s) a este cuidador.");
+                return;
+            }
+            caregiverService.delete(id);
+            System.out.println("✔ Cuidador removido com sucesso.");
+        } catch (NumberFormatException e) {
+            System.out.println("⚠ ID inválido.");
         }
     }
 
@@ -115,6 +142,45 @@ public class CLI {
         } else {
             System.out.println("\n--- MEDICAMENTOS ---");
             list.forEach(System.out::println);
+        }
+    }
+
+    private void editMedication() {
+        System.out.print("\nID do medicamento a editar: ");
+        try {
+            int id = Integer.parseInt(scanner.nextLine().trim());
+            Optional<Medication> medOpt = medService.findById(id);
+            if (medOpt.isEmpty()) {
+                System.out.println("⚠ Medicamento não encontrado.");
+                return;
+            }
+            Medication current = medOpt.get();
+
+            System.out.print("Novo nome (atual: " + current.getName() + "): ");
+            String name = scanner.nextLine();
+            if (name.isBlank()) {
+                name = current.getName();
+            }
+
+            System.out.print("Nova dosagem (atual: " + current.getDosage() + "): ");
+            String dosage = scanner.nextLine();
+            if (dosage.isBlank()) {
+                dosage = current.getDosage();
+            }
+
+            System.out.print("Novo horário (atual: " + current.getScheduleTime() + "): ");
+            String time = scanner.nextLine();
+            if (time.isBlank()) {
+                time = current.getScheduleTime();
+            }
+
+            if (medService.update(id, name, dosage, time)) {
+                System.out.println("✔ Medicamento atualizado com sucesso.");
+            } else {
+                System.out.println("⚠ Medicamento não encontrado.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("⚠ ID inválido.");
         }
     }
 

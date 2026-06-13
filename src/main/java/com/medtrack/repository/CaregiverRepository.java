@@ -52,4 +52,15 @@ public class CaregiverRepository {
         }
         return Optional.empty();
     }
+
+    public boolean delete(int id) {
+        String sql = "DELETE FROM caregivers WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao remover cuidador: " + e.getMessage());
+        }
+    }
 }

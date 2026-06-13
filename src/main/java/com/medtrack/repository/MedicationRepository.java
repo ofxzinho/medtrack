@@ -106,4 +106,33 @@ public class MedicationRepository {
             throw new RuntimeException("Erro ao atualizar medicamento: " + e.getMessage());
         }
     }
+
+    public boolean update(int id, String name, String dosage, String scheduleTime) {
+        String sql = "UPDATE medications SET name = ?, dosage = ?, schedule_time = ? WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, name);
+            stmt.setString(2, dosage);
+            stmt.setString(3, scheduleTime);
+            stmt.setInt(4, id);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao atualizar medicamento: " + e.getMessage());
+        }
+    }
+
+    public int countByCaregiverId(int caregiverId) {
+        String sql = "SELECT COUNT(*) FROM medications WHERE caregiver_id = ?";
+        try (Connection conn = DatabaseConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, caregiverId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao contar medicamentos: " + e.getMessage());
+        }
+        return 0;
+    }
 }
