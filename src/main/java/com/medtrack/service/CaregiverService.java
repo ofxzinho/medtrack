@@ -30,4 +30,8 @@ public class CaregiverService {
     public Optional<Caregiver> findById(int id) {
         return repository.findById(id);
     }
+
+    public boolean delete(int id) {
+        return repository.delete(id);
+    }
 }
