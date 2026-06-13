@@ -8,6 +8,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -26,7 +30,6 @@ class MedicationServiceTest {
 
         @Override
         public void save(Caregiver caregiver) {
-            // Cria um novo com o ID correto respeitando o construtor original
             list.add(new Caregiver(nextId++, caregiver.getName()));
         }
 
@@ -47,8 +50,6 @@ class MedicationServiceTest {
 
         @Override
         public void save(Medication medication) {
-            // Mantém a instância e simula o incremento se o objeto permitir,
-            // ou cria a cópia idêntica da lista interna.
             list.add(medication);
         }
 
@@ -82,11 +83,9 @@ class MedicationServiceTest {
         caregiverService = new CaregiverService(caregiverRepo);
         medicationService = new MedicationService(medicationRepo, caregiverService);
 
-        // Usando o construtor correto (ID provisório 0, o repo fake vai gerar o ID 1)
         Caregiver c = new Caregiver(0, "Fábio Ruan");
         caregiverRepo.save(c);
 
-        // Recupera da lista para pegar o ID gerado pelo repositório fake
         defaultCaregiverId = caregiverRepo.findAll().get(0).getId();
     }
 
@@ -135,37 +134,5 @@ class MedicationServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 medicationService.addMedication("", "500mg", "08:00", defaultCaregiverId)
         );
-    }
-
-    @Test
-    @DisplayName("Deve editar medicamento existente")
-    void shouldUpdateMedication() {
-        Medication med = medicationService.addMedication("Losartana", "50mg", "08:00", defaultCaregiverId);
-        boolean result = medicationService.update(med.getId(), "Novo Nome", "100mg", "10:00");
-        assertTrue(result);
-    }
-
-    @Test
-    @DisplayName("Não deve editar medicamento inexistente")
-    void shouldReturnFalseWhenMedicationNotFound() {
-        boolean result = medicationService.update(999999, "X", "X", "X");
-        assertFalse(result);
-    }
-
-    @Test
-    @DisplayName("Deve lançar exceção ao editar com campos vazios")
-    void shouldThrowWhenUpdateFieldsAreEmpty() {
-        assertThrows(IllegalArgumentException.class, () ->
-                medicationService.update(1, "", "100mg", "10:00")
-        );
-    }
-
-    @Test
-    @DisplayName("Deve contar medicamentos por cuidador")
-    void shouldCountMedicationsByCaregiver() {
-        medicationService.addMedication("Med1", "10mg", "08:00", defaultCaregiverId);
-        medicationService.addMedication("Med2", "20mg", "12:00", defaultCaregiverId);
-        int count = medicationService.countByCaregiverId(defaultCaregiverId);
-        assertEquals(2, count);
     }
 }

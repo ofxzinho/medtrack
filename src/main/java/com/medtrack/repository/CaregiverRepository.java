@@ -58,7 +58,8 @@ public class CaregiverRepository {
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
-            return stmt.executeUpdate() > 0;
+            int rows = stmt.executeUpdate();
+            return rows > 0;
         } catch (SQLException e) {
             throw new RuntimeException("Erro ao remover cuidador: " + e.getMessage());
         }
